@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遥感样本制作工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; font-size: 24px; }
+        .section { margin-bottom: 25px; padding: 20px; background: #fafafa; border-radius: 6px; border: 1px solid #eee; }
+        .section-title { font-size: 16px; font-weight: bold; color: #444; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #4a90d9; }
+        .form-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .form-row label { width: 120px; color: #666; }
+        .form-row input[type="text"], .form-row select { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-row input[type="file"] { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; }
+        .checkbox-item { display: flex; align-items: center; gap: 6px; }
+        .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; }
+        .btn { padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s; }
+        .btn-primary { background: #4a90d9; color: white; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-full { width: 100%; }
+        .progress-container { margin: 20px 0; }
+        .progress-bar { height: 24px; background: #e0e0e0; border-radius: 12px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4a90d9, #5da15f); width: 0%; transition: width 0.3s; }
+        .progress-text { text-align: center; margin-top: 8px; color: #666; font-size: 14px; }
+        .log-box { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; height: 200px; overflow-y: auto; font-family: Consolas, monospace; font-size: 13px; line-height: 1.6; }
+        .log-line { margin: 2px 0; }
+        .log-time { color: #888; }
+        .status-success { color: #5da15f; }
+        .status-error { color: #f48771; }
+        .status-info { color: #4fc1ff; }
+        .download-section { text-align: center; padding: 30px; }
+        .download-btn { background: #5da15f; color: white; text-decoration: none; padding: 15px 40px; border-radius: 4px; font-size: 18px; display: inline-block; }
+        .download-btn:hover { background: #4a8a4d; }
+        .file-hint { font-size: 12px; color: #999; margin-top: 4px; }
+        .band-config { margin-left: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px; margin-top: 10px; }
+        .band-config label { color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>遥感样本制作工具</h1>
+
+        <div class="section">
+            <div class="section-title">基础文件配置</div>
+            <div class="form-row">
+                <label>影像原图 (TIF):</label>
+                <input type="file" id="imageFile" accept=".tif,.tiff">
+            </div>
+            <div class="form-row">
+                <label>标签文件 (SHP):</label>
+                <input type="file" id="labelFile" accept=".shp,.tif,.tiff">
+                <span class="file-hint">支持 shapefile 或 TIFF 栅格标签</span>
+            </div>
+            <div class="form-row">
+                <label>姓名缩写:</label>
+                <input type="text" id="authorAbbr" placeholder="例如: ZS" maxlength="10">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">输出格式选择</div>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" id="outTif" checked> 原始 TIF</label>
+                <label class="checkbox-item"><input type="checkbox" id="outJpgTrue" checked> 真彩色 JPG</label>
+                <label class="checkbox-item"><input type="checkbox" id="outJpgFalse" checked> 假彩色 JPG</label>
+            </div>
+            <div class="band-config">
+                <div class="form-row">
+                    <label>真彩色波段 (R,G,B):</label>
+                    <input type="text" id="bandsTrue" value="3,2,1" style="width: 100px;">
+                </div>
+                <div class="form-row">
+                    <label>假彩色波段 (NIR,R,G):</label>
+                    <input type="text" id="bandsFalse" value="4,3,2" style="width: 100px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">切片参数</div>
+            <div class="form-row">
+                <label>样本尺寸:</label>
+                <select id="patchSize">
+                    <option value="128x128">128 x 128</option>
+                    <option value="256x256">256 x 256</option>
+                    <option value="512x512">512 x 512</option>
+                </select>
+                <label style="width: 80px; margin-left: 30px;">重叠率:</label>
+                <select id="overlapRatio">
+                    <option value="25%">25%</option>
+                    <option value="50%">50%</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section">
+            <button class="btn btn-primary btn-full" id="btnProcess" onclick="startProcess()">一键全流程处理</button>
+        </div>
+
+        <div class="section progress-container" id="progressSection" style="display: none;">
+            <div class="section-title">处理进度</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">准备中...</div>
+        </div>
+
+        <div class="section" id="logSection" style="display: none;">
+            <div class="section-title">运行日志</div>
+            <div class="log-box" id="logBox"></div>
+        </div>
+
+        <div class="section download-section" id="downloadSection" style="display: none;">
+            <p style="margin-bottom: 20px; color: #5da15f; font-size: 18px;">处理完成！</p>
+            <a class="download-btn" id="downloadBtn" href="#">下载结果文件</a>
+        </div>
+    </div>
+
+    <script>
+        let currentTaskId = null;
+        let statusTimer = null;
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function log(message, type = 'info') {
+            const logBox = document.getElementById('logBox');
+            const time = new Date().toLocaleTimeString();
+            const spanClass = type === 'error' ? 'status-error' : (type === 'success' ? 'status-success' : 'status-info');
+            logBox.innerHTML += `<div class="log-line"><span class="log-time">[${time}]</span> <span class="${spanClass}">${message}</span></div>`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        async function startProcess() {
+            const imageFile = document.getElementById('imageFile').files[0];
+            const labelFile = document.getElementById('labelFile').files[0];
+
+            if (!imageFile || !labelFile) {
+                alert('请先选择影像原图和标签文件');
+                return;
+            }
+
+            currentTaskId = generateUUID();
+            const btn = document.getElementById('btnProcess');
+            btn.disabled = true;
+
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('logSection').style.display = 'block';
+            document.getElementById('downloadSection').style.display = 'none';
+
+            log('任务ID: ' + currentTaskId);
+            log('开始上传文件...');
+
+            try {
+                const formData = new FormData();
+                formData.append('task_id', currentTaskId);
+                formData.append('image_file', imageFile);
+                formData.append('label_file', labelFile);
+
+                const uploadRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadRes.ok) throw new Error('文件上传失败');
+                log('文件上传完成');
+
+                const patchSize = document.getElementById('patchSize').value;
+                const overlapRatio = document.getElementById('overlapRatio').value;
+                const authorAbbr = document.getElementById('authorAbbr').value;
+
+                log('正在启动处理...');
+
+                const processRes = await fetch('/api/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_id: currentTaskId,
+                        patch_size: patchSize,
+                        overlap_ratio: overlapRatio,
+                        author_abbr: authorAbbr,
+                        output_formats: {
+                            tif: document.getElementById('outTif').checked,
+                            jpg_true: document.getElementById('outJpgTrue').checked,
+                            jpg_false: document.getElementById('outJpgFalse').checked
+                        },
+                        bands_true: document.getElementById('bandsTrue').value,
+                        bands_false: document.getElementById('bandsFalse').value
+                    })
+                });
+
+                if (!processRes.ok) throw new Error('处理启动失败');
+                log('处理已启动，正在等待完成...');
+
+                startStatusPolling();
+
+            } catch (err) {
+                log('错误: ' + err.message, 'error');
+                btn.disabled = false;
+            }
+        }
+
+        function startStatusPolling() {
+            statusTimer = setInterval(checkStatus, 2000);
+        }
+
+        async function checkStatus() {
+            if (!currentTaskId) return;
+
+            try {
+                const res = await fetch(`/api/status/${currentTaskId}`);
+                const data = await res.json();
+
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                progressFill.style.width = data.progress + '%';
+                progressText.textContent = data.message;
+
+                if (data.status === 'completed') {
+                    clearInterval(statusTimer);
+                    log('处理完成！', 'success');
+                    document.getElementById('downloadSection').style.display = 'block';
+                    document.getElementById('downloadBtn').href = `/api/download/${currentTaskId}`;
+                    document.getElementById('btnProcess').disabled = false;
+                } else if (data.status === 'error') {
+                    clearInterval(statusTimer);
+                    log('处理出错: ' + data.message, 'error');
+                    document.getElementById('btnProcess').disabled = false;
+                }
+
+            } catch (err) {
+                console.error('Status check failed:', err);
+            }
+        }
+    </script>
+</body>
+</html>

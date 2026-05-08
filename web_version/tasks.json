@@ -1,0 +1,301 @@
+{
+  "1454acab-21e7-4ef9-9224-b3ba1a6371ae": {
+    "status": "stopped",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\1454acab-21e7-4ef9-9224-b3ba1a6371ae\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\1454acab-21e7-4ef9-9224-b3ba1a6371ae\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "任务已停止",
+    "patch_size": "128x128",
+    "log_message": ""
+  },
+  "711520e1-2712-44a8-99da-94b849ed690b": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\711520e1-2712-44a8-99da-94b849ed690b\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\711520e1-2712-44a8-99da-94b849ed690b\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "正在启动处理...",
+    "patch_size": "512x512",
+    "log_message": ""
+  },
+  "6ffe4af6-3039-4e0e-8907-2d00227dcdda": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\6ffe4af6-3039-4e0e-8907-2d00227dcdda\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\6ffe4af6-3039-4e0e-8907-2d00227dcdda\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "正在启动处理...",
+    "patch_size": "128x128",
+    "log_message": ""
+  },
+  "c135511a-2813-4703-bc40-174e55d3dbe0": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\c135511a-2813-4703-bc40-174e55d3dbe0\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "F:\\RemoteSensingSampleTool\\web_version\\outputs",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\c135511a-2813-4703-bc40-174e55d3dbe0\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "处理出错: 预处理阶段失败",
+    "patch_size": "128x128",
+    "log_message": ""
+  },
+  "bb7cc2b9-6ffe-4749-a806-72d5cd58fb01": {
+    "status": "error",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\bb7cc2b9-6ffe-4749-a806-72d5cd58fb01\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\bb7cc2b9-6ffe-4749-a806-72d5cd58fb01\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 78,
+    "message": "处理进程异常退出，错误码: 3221225477",
+    "patch_size": "512x512",
+    "log_message": ""
+  },
+  "222cb13a-4898-4509-aa57-184c7bc77e4b": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\222cb13a-4898-4509-aa57-184c7bc77e4b\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\222cb13a-4898-4509-aa57-184c7bc77e4b\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "正在启动处理...",
+    "patch_size": "512x512",
+    "log_message": ""
+  },
+  "e5923537-0328-4c51-9573-1ba7c094313a": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\e5923537-0328-4c51-9573-1ba7c094313a\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\e5923537-0328-4c51-9573-1ba7c094313a\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 88,
+    "message": "正在启动处理...",
+    "patch_size": "512x512",
+    "log_message": ""
+  },
+  "488c8d95-e134-4815-a3f7-adca35ade530": {
+    "status": "stopped",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\488c8d95-e134-4815-a3f7-adca35ade530\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "bands_false": "4,3,2",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\488c8d95-e134-4815-a3f7-adca35ade530\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "log_message": "",
+    "progress": 0,
+    "message": "任务已停止",
+    "patch_size": "512x512"
+  },
+  "f5c9db32-5b4a-49e2-96e9-b12890b090e2": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\f5c9db32-5b4a-49e2-96e9-b12890b090e2\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\f5c9db32-5b4a-49e2-96e9-b12890b090e2\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "处理出错: 预处理阶段失败",
+    "patch_size": "128x128",
+    "log_message": ""
+  },
+  "0d7fa71e-f61f-4e7b-b25e-35ee99b8b9d7": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\0d7fa71e-f61f-4e7b-b25e-35ee99b8b9d7\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\0d7fa71e-f61f-4e7b-b25e-35ee99b8b9d7\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "正在启动处理...",
+    "patch_size": "512x512",
+    "log_message": ""
+  },
+  "c5ec7933-460f-40b8-8336-c4555697efd2": {
+    "status": "processing",
+    "image_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\c5ec7933-460f-40b8-8336-c4555697efd2\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff",
+    "author_abbr": "XCS",
+    "uploaded_label_files": [
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.cpg",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.dbf",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.prj",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbn",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.sbx",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp.xml",
+      "GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shx"
+    ],
+    "output_formats": {
+      "jpg_true": true,
+      "jpg_false": true,
+      "tif": true
+    },
+    "bands_true": "3,2,1",
+    "overlap_ratio": "25%",
+    "output_path": "",
+    "label_path": "F:\\RemoteSensingSampleTool\\web_version\\uploads\\c5ec7933-460f-40b8-8336-c4555697efd2\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp",
+    "bands_false": "4,3,2",
+    "progress": 0,
+    "message": "正在启动处理...",
+    "patch_size": "512x512",
+    "log_message": ""
+  }
+}

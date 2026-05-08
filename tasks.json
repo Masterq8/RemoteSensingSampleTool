@@ -1,0 +1,20 @@
+{
+  "739f966d-f6e1-44d6-88fc-77d660e87cb7": {
+    "status": "processing", 
+    "image_path": "F:\\RS\\RS_Sample\\uploads\\739f966d-f6e1-44d6-88fc-77d660e87cb7\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001-pansharpen.tiff", 
+    "author_abbr": "XCS", 
+    "output_formats": {
+      "jpg_true": true, 
+      "jpg_false": true, 
+      "tif": true
+    }, 
+    "bands_true": "3,2,1", 
+    "overlap_ratio": "25%", 
+    "output_path": "F:\\RS\\RS_Sample\\outputs", 
+    "progress": 5, 
+    "label_path": "F:\\RS\\RS_Sample\\uploads\\739f966d-f6e1-44d6-88fc-77d660e87cb7\\GF1_PMS2_E119.7_N34.6_20240815_L1A13524731001_灌云区.shp", 
+    "bands_false": "4,3,2", 
+    "log_message": "", 
+    "message":
+   
+  
