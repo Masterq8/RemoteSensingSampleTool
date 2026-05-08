@@ -15,8 +15,113 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = FastAPI(title="遥感样本制作工具")
 
-# 硬编码的 Python 路径（ArcGIS 环境）
-PYTHON_EXE = r"C:\Python27\ArcGIS10.8\python.exe"
+def find_arcgis_python():
+    """
+    自动查找 ArcGIS 10.8 自带的 Python 2.7 解释器
+    
+    返回值：
+        str: 找到的 Python 解释器路径，如果未找到返回 None
+    """
+    # ArcGIS 10.8 常见的安装路径
+    candidate_paths = [
+        # 标准安装路径
+        r"C:\Python27\ArcGIS10.8\python.exe",
+        # 64 位版本路径
+        r"C:\Python27\ArcGISx6410.8\python.exe",
+        # 完整安装路径
+        r"C:\Program Files (x86)\ArcGIS\Desktop10.8\bin\Python.exe",
+        # 备用路径
+        r"C:\Program Files\ArcGIS\Desktop10.8\bin\Python.exe",
+        # 用户自定义安装路径（通过注册表）
+    ]
+    
+    # 从注册表查找 ArcGIS 安装路径
+    try:
+        import winreg
+        
+        # 32 位注册表路径
+        reg_paths = [
+            r"SOFTWARE\ESRI\ArcGIS",
+            r"SOFTWARE\Wow6432Node\ESRI\ArcGIS",
+        ]
+        
+        for reg_path in reg_paths:
+            try:
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
+                    try:
+                        install_dir = winreg.QueryValueEx(key, "InstallDir")[0]
+                        if install_dir:
+                            # 构建可能的 Python 路径
+                            python_candidates = [
+                                os.path.join(install_dir, r"bin\Python.exe"),
+                                os.path.join(install_dir, r"python\python.exe"),
+                            ]
+                            candidate_paths.extend(python_candidates)
+                    except FileNotFoundError:
+                        pass
+            except FileNotFoundError:
+                pass
+    except ImportError:
+        pass  # 非 Windows 系统或无注册表访问权限
+    
+    # 去重并检查每个候选路径
+    for python_path in list(set(candidate_paths)):
+        if os.path.exists(python_path):
+            # 验证 Python 版本是否为 2.7
+            try:
+                result = subprocess.run(
+                    [python_path, "--version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                version_output = result.stdout.strip() or result.stderr.strip()
+                
+                # 检查版本信息
+                if "Python 2.7" in version_output:
+                    # 验证是否为 ArcGIS 版本（检查 arcpy 是否可用）
+                    try:
+                        check_arcpy = subprocess.run(
+                            [python_path, "-c", "import arcpy; print(arcpy.GetInstallInfo()['Version'])"],
+                            capture_output=True,
+                            text=True,
+                            timeout=10
+                        )
+                        arcgis_version = check_arcpy.stdout.strip()
+                        
+                        # 检查是否为 10.8 版本
+                        if "10.8" in arcgis_version:
+                            print(f"[INFO] 找到 ArcGIS 10.8 Python 2.7: {python_path}")
+                            return python_path
+                        elif check_arcpy.returncode == 0:
+                            # arcpy 可用但版本不是 10.8
+                            print(f"[INFO] 找到 ArcGIS Python 但版本不是 10.8: {arcgis_version}")
+                    except subprocess.TimeoutExpired:
+                        print(f"[INFO] 检查 ArcPy 超时: {python_path}")
+                    except Exception as e:
+                        print(f"[INFO] 检查 ArcPy 失败: {python_path}, {e}")
+                else:
+                    print(f"[INFO] 版本不是 Python 2.7: {version_output}")
+            except subprocess.TimeoutExpired:
+                print(f"[INFO] 检查版本超时: {python_path}")
+            except Exception as e:
+                print(f"[INFO] 检查版本失败: {python_path}, {e}")
+    
+    return None
+
+# 自动查找 ArcGIS Python
+PYTHON_EXE = find_arcgis_python()
+
+# 如果自动查找失败，使用默认路径作为备选
+if PYTHON_EXE is None:
+    print("[WARNING] 无法自动找到 ArcGIS 10.8 Python 2.7")
+    print("[WARNING] 使用默认路径: C:\\Python27\\ArcGIS10.8\\python.exe")
+    PYTHON_EXE = r"C:\Python27\ArcGIS10.8\python.exe"
+    
+    # 验证默认路径是否存在
+    if not os.path.exists(PYTHON_EXE):
+        print("[ERROR] 默认路径也不存在！")
+        print("[ERROR] 请确保已安装 ArcGIS 10.8 或手动修改 PYTHON_EXE 变量")
 
 app.add_middleware(
     CORSMiddleware,
@@ -167,8 +272,43 @@ async def root():
 
 @app.get("/api/detect-python")
 async def detect_python():
-    # 此接口已禁用，Python 路径硬编码为 C:\Python27\ArcGIS10.4\python.exe
-    return {"found": True, "path": PYTHON_EXE, "version": "Python 2.7 (ArcGIS 10.4)"}
+    """
+    检测系统中的 ArcGIS Python 解释器
+    """
+    # 获取 Python 版本信息
+    version_info = "未知"
+    arcgis_version = "未知"
+    
+    if os.path.exists(PYTHON_EXE):
+        try:
+            result = subprocess.run(
+                [PYTHON_EXE, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            version_info = result.stdout.strip() or result.stderr.strip()
+        except Exception:
+            pass
+        
+        try:
+            result = subprocess.run(
+                [PYTHON_EXE, "-c", "import arcpy; print(arcpy.GetInstallInfo()['Version'])"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            arcgis_version = result.stdout.strip() or "ArcGIS 版本检测失败"
+        except Exception:
+            pass
+    
+    return {
+        "found": os.path.exists(PYTHON_EXE),
+        "path": PYTHON_EXE,
+        "python_version": version_info,
+        "arcgis_version": arcgis_version,
+        "message": "自动检测成功" if os.path.exists(PYTHON_EXE) else "未找到有效的 Python 解释器"
+    }
 
 @app.post("/api/upload")
 async def upload_files(
