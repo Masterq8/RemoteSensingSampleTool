@@ -44,8 +44,7 @@ except ImportError:
 
 def safe_open(filepath, mode='r', encoding='utf-8'):
     if sys.version_info[0] < 3:
-        import codecs
-        return codecs.open(filepath, mode, encoding)
+        return io.open(filepath, mode, encoding=encoding)
     else:
         return open(filepath, mode, encoding=encoding)
 

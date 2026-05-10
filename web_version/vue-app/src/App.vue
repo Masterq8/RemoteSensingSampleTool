@@ -176,6 +176,7 @@
                 </button>
               </div>
             </div>
+            
             <p class="status-message">{{ progressMessage }}</p>
           </div>
           <div class="panel-idle" v-else>
@@ -209,16 +210,43 @@
           </div>
         </div>
 
-        <div class="panel download-panel" v-if="status === 'completed'">
-          <div class="success-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <div class="panel download-panel">
+          <div class="success-icon" :class="{ disabled: status !== 'completed' }">
+            <svg v-if="status === 'completed'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg v-else width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-          <h3 class="success-title">处理完成</h3>
-          <p class="success-desc">任务已成功完成，点击下方下载结果</p>
-          <a :href="downloadUrl" class="download-btn" target="_blank" download>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>下载结果文件</span>
-          </a>
+          <h3 class="success-title">{{ status === 'completed' ? '处理完成' : '等待任务' }}</h3>
+          <p class="success-desc">{{ status === 'completed' ? '任务已成功完成，点击下方下载结果' : '请先上传文件并启动任务' }}</p>
+          
+          <div v-if="downloadInfo" class="download-info">
+            <div class="info-item">
+              <span class="info-label">文件大小</span>
+              <span class="info-value">{{ formatFileSize(downloadInfo.file_size) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">文件名</span>
+              <span class="info-value">{{ downloadInfo.file_name }}</span>
+            </div>
+          </div>
+
+          <div v-if="downloading" class="download-progress">
+            <div class="progress-track">
+              <div class="progress-fill" :style="{ width: downloadProgress + '%' }"></div>
+            </div>
+            <span class="progress-text">{{ downloadProgress }}%</span>
+          </div>
+
+          <div v-if="downloadError" class="download-error">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>{{ downloadError }}</span>
+            <button class="retry-btn" @click="handleDownload">重试</button>
+          </div>
+
+          <button v-else class="download-btn" @click="handleDownload" :disabled="downloading || status !== 'completed'">
+            <svg v-if="!downloading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg v-else class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-6.32"/><path d="M12 3v9"/></svg>
+            <span>{{ downloading ? '下载中...' : '下载结果文件' }}</span>
+          </button>
         </div>
       </section>
     </main>
@@ -227,7 +255,7 @@
       <p>遥感样本制作工具 v1.0.0</p>
     </footer>
 
-    <div class="modal-overlay" v-if="showCompleteModal" @click.self="resetAll">
+    <div class="modal-overlay" v-if="showCompleteModal" @click.self="closeModal">
       <div class="modal-content">
         <div class="modal-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -235,8 +263,8 @@
         <h3 class="modal-title">任务已完成</h3>
         <p class="modal-desc">处理已成功完成，您可以下载结果文件</p>
         <div class="modal-actions">
-          <button class="modal-btn modal-btn-secondary" @click="showCompleteModal = false">关闭</button>
-          <button class="modal-btn modal-btn-primary" @click="resetAll">完成</button>
+          <button class="modal-btn modal-btn-secondary" @click="closeModal">关闭</button>
+          <button class="modal-btn modal-btn-primary" @click="closeModal">完成</button>
         </div>
       </div>
     </div>
@@ -268,6 +296,11 @@ const labelInput = ref(null)
 
 const theme = ref('dark')
 const showCompleteModal = ref(false)
+const downloadInfo = ref(null)
+const downloading = ref(false)
+const downloadProgress = ref(0)
+const downloadError = ref(null)
+const taskCompleted = ref(false)
 let statusTimer = null
 let logTimer = null
 let lastLogMessage = ''
@@ -275,17 +308,30 @@ let progressTimer = null
 
 function startProgressAnimation() {
   if (progressTimer) clearInterval(progressTimer)
+  
+  if (displayProgress.value >= progress.value) {
+    if (displayProgress.value >= 100 && showCompleteModal.value === false && status.value === 'completed') {
+      setTimeout(() => { showCompleteModal.value = true }, 500)
+    }
+    return
+  }
+  
+  const step = Math.max(1, Math.ceil((progress.value - displayProgress.value) / 50))
+  
   progressTimer = setInterval(() => {
     if (displayProgress.value < progress.value) {
-      displayProgress.value += 1
+      displayProgress.value = Math.min(displayProgress.value + step, progress.value)
     } else {
       clearInterval(progressTimer)
       progressTimer = null
-      if (displayProgress.value >= 100 && showCompleteModal.value === false && status.value === 'completed') {
-        showCompleteModal.value = true
-      }
     }
-  }, 80)
+    
+    if (displayProgress.value >= 100 && showCompleteModal.value === false && status.value === 'completed') {
+      clearInterval(progressTimer)
+      progressTimer = null
+      setTimeout(() => { showCompleteModal.value = true }, 500)
+    }
+  }, 50)
 }
 
 const downloadUrl = computed(() => `/api/download/${taskId.value}`)
@@ -418,11 +464,104 @@ async function checkStatus() {
       clearInterval(logTimer);
       status.value = 'completed';
       progress.value = 100;
-      startProgressAnimation()
+      taskCompleted.value = true;
+      if (displayProgress.value < 100) {
+        startProgressAnimation()
+      } else {
+        setTimeout(() => { showCompleteModal.value = true }, 500)
+      }
       addLog('success', '处理完成！');
+      await fetchDownloadInfo();
     }
     else if (data.status === 'error') { clearInterval(statusTimer); clearInterval(logTimer); status.value = 'error'; addLog('error', '处理出错: ' + data.message) }
   } catch (e) { console.error('Status check failed:', e) }
+}
+
+async function fetchDownloadInfo() {
+  if (!taskId.value) return
+  try {
+    const res = await fetch(`/api/download-info/${taskId.value}`)
+    if (res.ok) {
+      downloadInfo.value = await res.json()
+    }
+  } catch (e) {
+    console.error('Failed to fetch download info:', e)
+  }
+}
+
+function handleDownloadClick() {
+  if (!taskId.value || downloading.value) return
+  
+  if (status.value === 'processing' && !taskCompleted.value) {
+    addLog('warn', '任务未完成，请等待处理结束后再下载')
+    return
+  }
+  
+  handleDownload()
+}
+
+async function handleDownload() {
+  if (!taskId.value || downloading.value) return
+  
+  downloading.value = true
+  downloadError.value = null
+  downloadProgress.value = 0
+  
+  try {
+    const url = `/api/download/${taskId.value}`
+    const response = await fetch(url)
+    
+    if (!response.ok) {
+      throw new Error(`下载失败: ${response.status}`)
+    }
+    
+    const contentLength = response.headers.get('Content-Length')
+    const total = contentLength ? parseInt(contentLength) : 0
+    let loaded = 0
+    
+    const reader = response.body.getReader()
+    const chunks = []
+    
+    while (true) {
+      const { done, value } = await reader.read()
+      
+      if (done) break
+      
+      chunks.push(value)
+      loaded += value.length
+      
+      if (total > 0) {
+        downloadProgress.value = Math.round((loaded / total) * 100)
+      }
+    }
+    
+    const blob = new Blob(chunks)
+    const downloadUrl = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = downloadUrl
+    a.download = downloadInfo.value?.file_name || `遥感样本_${taskId.value}.zip`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(downloadUrl)
+    
+    downloading.value = false
+    downloadProgress.value = 100
+    addLog('success', '文件下载完成')
+    
+    setTimeout(() => {
+      downloadProgress.value = 0
+    }, 2000)
+    
+  } catch (err) {
+    downloading.value = false
+    downloadError.value = err.message || '下载失败，请重试'
+    addLog('error', '下载失败: ' + downloadError.value)
+  }
+}
+
+function closeModal() {
+  showCompleteModal.value = false
 }
 
 function resetAll() {
@@ -444,6 +583,9 @@ function resetAll() {
   taskId.value = ''
   lastLogMessage = ''
   showCompleteModal.value = false
+  taskCompleted.value = false
+  downloadInfo.value = null
+  downloadError.value = null
   
   if (imageInput.value) {
     imageInput.value.value = ''
@@ -455,6 +597,18 @@ function resetAll() {
   addLog('info', '遥感样本制作工具已就绪')
 }
 
+function parseStepProgress(msg) {
+  const match = msg.match(/\[(\d+)\/(\d+)\]/)
+  if (match) {
+    const current = parseInt(match[1])
+    const total = parseInt(match[2])
+    if (!isNaN(current) && !isNaN(total) && total > 0) {
+      return current / total
+    }
+  }
+  return null
+}
+
 async function fetchLogs() {
   if (!taskId.value) return
   try {
@@ -463,10 +617,48 @@ async function fetchLogs() {
       const data = await res.json()
       if (data.logs && data.logs.length > logs.value.length) {
         const seen = new Set()
-        data.logs.slice(logs.value.length).forEach(msg => { if (!seen.has(msg)) { seen.add(msg); addLog('info', msg) } })
+        data.logs.slice(logs.value.length).forEach(msg => { 
+          if (!seen.has(msg)) { 
+            seen.add(msg)
+            addLog('info', msg)
+            
+            if (status.value === 'processing' && !taskCompleted.value) {
+              if (msg.includes('全部完成') || msg.includes('全部完成！') || msg.includes('处理完毕')) {
+                progress.value = 100
+                markTaskAsCompleted()
+                return
+              }
+              
+              const stepRatio = parseStepProgress(msg)
+              if (stepRatio !== null) {
+                const stepPercent = Math.floor(stepRatio * 100)
+                if (stepPercent > progress.value && stepPercent < 100) {
+                  progress.value = stepPercent
+                  displayProgress.value = stepPercent
+                }
+              }
+            }
+          } 
+        })
       }
     }
   } catch (e) { /* ignore */ }
+}
+
+function markTaskAsCompleted() {
+  if (taskCompleted.value) return
+  
+  clearInterval(statusTimer)
+  clearInterval(logTimer)
+  status.value = 'completed'
+  taskCompleted.value = true
+  displayProgress.value = 100
+  
+  setTimeout(() => { 
+    showCompleteModal.value = true 
+  }, 300)
+  
+  fetchDownloadInfo()
 }
 
 async function stopProcess() {
@@ -487,6 +679,31 @@ async function stopProcess() {
   status.value = 'idle'
   progress.value = 0
   displayProgress.value = 0
+}
+
+async function checkRunningTasks() {
+  try {
+    const response = await fetch('/api/tasks')
+    const tasks = await response.json()
+    const processingTask = tasks.find(t => t.status === 'processing')
+    const completedTask = tasks.find(t => t.status === 'completed')
+    
+    if (processingTask) {
+      taskId.value = processingTask.task_id
+      status.value = 'processing'
+      addLog('info', `发现正在运行的任务: ${processingTask.task_id}`)
+      startStatusPolling()
+    } else if (completedTask) {
+      taskId.value = completedTask.task_id
+      status.value = 'completed'
+      progress.value = 100
+      displayProgress.value = 100
+      addLog('info', `发现已完成的任务: ${completedTask.task_id}`)
+      fetchDownloadInfo()
+    }
+  } catch (error) {
+    addLog('error', '检查任务状态失败: ' + error.message)
+  }
 }
 
 onMounted(() => { initTheme(); addLog('info', '遥感样本制作工具已就绪') })
@@ -775,17 +992,17 @@ body {
 
 .progress-area { display: flex; align-items: center; gap: .9rem; margin-bottom: .6rem; }
 .progress-track {
-  flex: 1; height: 6px;
+  flex: 1; height: 6px; min-width: 150px;
   background: var(--border); border-radius: 3px; overflow: hidden;
 }
 .progress-fill {
   height: 100%;
   background: var(--btn-grad);
   border-radius: 3px;
-  transition: width .8s cubic-bezier(.25,.8,.25,1);
+  transition: width .5s ease-out;
   position: relative;
 }
-.progress-right { display: flex; align-items: center; gap: .7rem; }
+.progress-right { display: flex; align-items: center; gap: .7rem; min-width: 120px; }
 .progress-pct { font-size: 1.25rem; font-weight: 800; color: var(--blue); min-width: 3rem; text-align: right; }
 .progress-pct small { font-size: .7rem; font-weight: 500; }
 .stop-btn {
@@ -872,7 +1089,118 @@ body {
   transition: all .25s; margin-top: .35rem;
   box-shadow: 0 4px 16px rgba(14,168,106,0.3);
 }
-.download-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(14,168,106,0.4); }
+.download-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(14,168,106,0.4); }
+.download-btn:disabled { 
+  opacity: 1; 
+  cursor: not-allowed; 
+  background: var(--surface2); 
+  color: var(--text-3); 
+  box-shadow: none;
+}
+
+.success-icon.disabled {
+  color: var(--text-4);
+}
+.success-title:has(+ .success-icon.disabled),
+.success-title + .success-desc:has(+ .download-info) {
+  color: var(--text-3);
+}
+
+.download-info {
+  width: 100%;
+  padding: .75rem 1rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: .5rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .35rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-item:last-child { border-bottom: none; }
+
+.info-label {
+  font-size: .72rem;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: .78rem;
+  color: var(--text-1);
+  font-weight: 600;
+}
+
+.download-progress {
+  width: 100%;
+  margin-bottom: .5rem;
+}
+
+.download-progress .progress-track {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.download-progress .progress-fill {
+  background: var(--btn-green);
+  border-radius: 4px;
+  transition: width .3s ease;
+}
+
+.download-progress .progress-text {
+  display: block;
+  text-align: center;
+  font-size: .75rem;
+  color: var(--text-2);
+  margin-top: .25rem;
+}
+
+.download-error {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem 1rem;
+  background: rgba(255,85,101,0.1);
+  border: 1px solid rgba(255,85,101,0.3);
+  border-radius: var(--radius-sm);
+  margin-bottom: .5rem;
+  font-size: .78rem;
+  color: var(--red);
+}
+
+.retry-btn {
+  padding: .35rem .85rem;
+  background: var(--btn-blue);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.retry-btn:hover {
+  background: var(--btn-blue-hover);
+  transform: translateY(-1px);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 /* ─── Footer ─── */
 .app-footer {

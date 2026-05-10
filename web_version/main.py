@@ -5,7 +5,7 @@ import uuid
 import shutil
 import subprocess
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
@@ -430,12 +430,15 @@ async def process_request(req: ProcessRequest):
                 # 进程结束后从字典中移除
                 if req.task_id in running_processes:
                     del running_processes[req.task_id]
-                if returncode != 0:
-                    tasks_inner = load_tasks()
-                    if req.task_id in tasks_inner and tasks_inner[req.task_id]["status"] == "processing":
+                tasks_inner = load_tasks()
+                if req.task_id in tasks_inner and tasks_inner[req.task_id]["status"] == "processing":
+                    if returncode != 0:
                         tasks_inner[req.task_id]["status"] = "error"
                         tasks_inner[req.task_id]["message"] = "处理进程异常退出，错误码: {0}".format(returncode)
-                        save_tasks(tasks_inner)
+                    else:
+                        tasks_inner[req.task_id]["status"] = "completed"
+                        tasks_inner[req.task_id]["message"] = "处理完成"
+                    save_tasks(tasks_inner)
             except subprocess.TimeoutExpired:
                 pass
             except Exception:
@@ -470,7 +473,7 @@ async def get_status(task_id: str):
     return {
         "task_id": task_id,
         "status": task["status"],
-        "progress": task.get("progress", 0),
+        "progress": 100 if task["status"] == "completed" else task.get("progress", 0),
         "message": task.get("message", ""),
         "log_message": log_message,
         "download_url": download_url
@@ -505,7 +508,61 @@ async def download_result(task_id: str):
     if not os.path.exists(zip_path):
         raise HTTPException(status_code=404, detail="Output not found")
 
-    return FileResponse(zip_path, filename=f"遥感样本_{task_id}.zip", media_type="application/zip")
+    file_size = os.path.getsize(zip_path)
+    
+    def iterfile():
+        with open(zip_path, 'rb') as f:
+            while True:
+                chunk = f.read(8192)
+                if not chunk:
+                    break
+                yield chunk
+
+    headers = {
+        "Content-Disposition": f'attachment; filename="{task_id}.zip"',
+        "Content-Type": "application/zip",
+        "Content-Length": str(file_size),
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Content-Type-Options": "nosniff",
+        "Access-Control-Expose-Headers": "Content-Disposition, Content-Length"
+    }
+    
+    return StreamingResponse(
+        iterfile(),
+        media_type="application/zip",
+        headers=headers
+    )
+
+@app.get("/api/download-info/{task_id}")
+async def get_download_info(task_id: str):
+    tasks = load_tasks()
+    if task_id not in tasks:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task = tasks[task_id]
+    if task["status"] != "completed":
+        raise HTTPException(status_code=400, detail="Task not completed yet")
+
+    output_dir = os.path.join(BASE_OUTPUT_DIR, task_id)
+    zip_path = os.path.join(BASE_OUTPUT_DIR, f"{task_id}.zip")
+
+    if not os.path.exists(zip_path):
+        if os.path.exists(output_dir):
+            shutil.make_archive(zip_path.replace(".zip", ""), "zip", output_dir)
+
+    if not os.path.exists(zip_path):
+        raise HTTPException(status_code=404, detail="Output not found")
+
+    file_size = os.path.getsize(zip_path)
+    return {
+        "task_id": task_id,
+        "file_size": file_size,
+        "file_size_mb": round(file_size / (1024 * 1024), 2),
+        "file_name": f"遥感样本_{task_id}.zip",
+        "ready": True
+    }
 
 @app.post("/api/stop/{task_id}")
 async def stop_task(task_id: str):
