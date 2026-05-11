@@ -65,15 +65,6 @@
                 <span class="file-tag" v-for="(f, idx) in labelFiles" :key="idx">{{ f.name }}</span>
               </div>
             </div>
-            <div class="field">
-              <label class="field-label">保存路径</label>
-              <div class="path-row">
-                <input type="text" v-model="outputPath" placeholder="./output/[任务ID]" class="text-input path-input">
-                <button class="icon-btn" @click="browseOutputPath" title="选择文件夹">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -277,7 +268,6 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 const imageFile = ref(null)
 const labelFiles = ref([])
 const authorAbbr = ref('')
-const outputPath = ref('')
 const outputFormats = ref({ tif: true, jpg_true: true, jpg_false: true })
 const bandsTrue = ref('3,2,1')
 const bandsFalse = ref('4,3,2')
@@ -373,14 +363,6 @@ function formatFileSize(bytes) {
 function onImageSelect(e) { imageFile.value = e.target.files[0] }
 function onLabelSelect(e) { labelFiles.value = Array.from(e.target.files) }
 
-function browseOutputPath() {
-  const input = document.createElement('input')
-  input.type = 'text'
-  input.webkitdirectory = true
-  input.onchange = (e) => { if (e.target.value) outputPath.value = e.target.value }
-  input.click()
-}
-
 function cleanMessage(message) {
   return message.replace(/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]\s*/, '')
 }
@@ -429,7 +411,7 @@ async function startProcess() {
       body: JSON.stringify({
         task_id: taskId.value, patch_size: patchSize.value,
         overlap_ratio: overlapRatio.value, author_abbr: authorAbbr.value,
-        output_path: outputPath.value, output_formats: outputFormats.value,
+        output_formats: outputFormats.value,
         bands_true: bandsTrue.value, bands_false: bandsFalse.value
       })
     })
@@ -569,7 +551,6 @@ function resetAll() {
   imageFile.value = null
   labelFiles.value = []
   authorAbbr.value = ''
-  outputPath.value = ''
   outputFormats.value = { tif: true, jpg_true: true, jpg_false: true }
   bandsTrue.value = '3,2,1'
   bandsFalse.value = '4,3,2'
